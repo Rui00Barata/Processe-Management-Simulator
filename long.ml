@@ -1,0 +1,1 @@
+(*Função de Escalonamento de Longo Prazo*)
