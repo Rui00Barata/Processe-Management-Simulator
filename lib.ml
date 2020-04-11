@@ -14,17 +14,17 @@ type instruction =
 (*PROCESSS CONTROL BLOCK*)
 type pcb = 
 {
-	nome : string; 				(*nome da primeira instrução*)
+	nome : string; 				(*nome do programa*)
 	start : int;					(*endereço da primeira instrução*)
 	variavel : int;				(*valor da variável*)
 	pid : int;						(*PID*)
 	ppid : int;						(*PPID*)
 	prioridade : int;			(*Prioridade do programa*)
 	pc : int;							(*Program Counter*)
-	estado : int					(*Estaado do program: blocked,...*)
+	estado : int					(*Estado do program: blocked,...*)
 }
 
-(*GESTO DE PROCESSOS*)
+(*GESTOR DE PROCESSOS*)
 let tempo = ref 0
 
 let cpu = ref 0
@@ -37,7 +37,7 @@ let blocked = Queue.create
 
 type running_state = 
 {
-	ind : int;						(*indice do PCBTabela*)
+	ind : int;						(*Índice do PCBTabela*)
 	pid : int;						(*PID do processo em execução*)
 	pc : int							(*Program counter do processo*)
 }
