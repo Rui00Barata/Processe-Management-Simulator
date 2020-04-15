@@ -3,9 +3,11 @@
 Open Lib
 
 (*Variáveis*)
-let memory_model = Array.make 1000 {ins = 'N'; n = 0; nome = ""}
-let ultimo = ref 0
+let memory = Array.make 1000 {ins = 'N'; n = 0; nome = ""}
+let next_memory_index = ref 0
+let process_list = ref [](**)
 
+(*{nome = "progenitor"; start = "0"; variavel = ; pid = ; ppid = ; prioridade = ; pc = ; estado = 0;}*)
 
 (*Funções*)
 let tirar_CR str =
@@ -26,8 +28,9 @@ let line_to_instr line =
     else {ins = 'E';n = 0;nome = ""}
 
 
-let abrir path =
-  let fi = open_in path in
+let abrir filename =
+  let process = {nome = filename; start = !next_memory_index; variavel = 0; pid = !next_pid; ppid = 0; prioridade = 0; pc = 0; estado = 0} in
+  let fi = open_in (filename^".prg") in
   let flag = ref true in
   let line = ref "" in
   let instr = ref {ins = 'N'; n = 0; nome = ""} in
@@ -36,10 +39,9 @@ let abrir path =
       begin 
         line := input_line fi;
         instr := line_to_instr !line;
-        memory_model.(!ultimo) <- !instr;
-        ultimo := !ultimo + 1 
+        memory.(!next_memory_index) <- !instr;
+        next_memory_index := !next_memory_index + 1;
       end
-      with End_of_file -> begin line := "EOF"; close_in fi; flag := false end
+      with End_of_file -> begin line := "EOF"; close_in fi; flag := false; process_list := !process_list@[process]; next_pid := !next_pid + 1 end
   done
-
-
+  
