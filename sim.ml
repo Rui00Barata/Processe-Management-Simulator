@@ -5,7 +5,6 @@ Open Lib
 (*Variáveis*)
 let memory = Array.make 1000 {ins = 'N'; n = 0; nome = ""}
 let next_memory_index = ref 0
-let process_list = ref [](**)
 
 (*{nome = "progenitor"; start = "0"; variavel = ; pid = ; ppid = ; prioridade = ; pc = ; estado = 0;}*)
 
@@ -29,7 +28,7 @@ let line_to_instr line =
 
 
 let abrir filename =
-  let process = {nome = filename; start = !next_memory_index; variavel = 0; pid = !next_pid; ppid = 0; prioridade = 0; pc = 0; estado = 0} in
+  let process = {nome = filename; start = !next_memory_index; variavel = 0; pid = !next_pid; ppid = 0; prioridade = 0; pc = 0; estado = 0};
   let fi = open_in (filename^".prg") in
   let flag = ref true in
   let line = ref "" in
@@ -42,6 +41,26 @@ let abrir filename =
         memory.(!next_memory_index) <- !instr;
         next_memory_index := !next_memory_index + 1;
       end
-      with End_of_file -> begin line := "EOF"; close_in fi; flag := false; process_list := !process_list@[process]; next_pid := !next_pid + 1 end
-  done
+      with End_of_file -> begin line := "EOF"; close_in fi; flag := false; pcb_table := !pcb_table @ [process]; next_pid := !next_pid + 1 end
+  done;
   
+let read_instr instr process =
+  match instr.ins with
+  | 'M' -> process.variavel <- instr.n
+  | 'A' -> process.variavel <- (process.variavel + instr.n) 
+  | 'S' -> process.variavel <- (process.variavel - instr.n) 
+  | 'B' -> process.estado <- 2
+  | 'T' -> process.estado <- 3
+  | 'C' -> let proc = process in
+          begin
+            process.pc <- (process.pc + instr.n);
+            proc.pid <- !next_pid;
+            proc.ppid <- process.pid; 
+            next_pid := !next_pid + 1;
+            pcb_table := !pcb_table @ [proc]
+          end
+  | 'L' -> begin
+            (List.nth pcb_table (List.length pcb_table - 1)).nome <- instr.nome;
+            abrir ((List.nth pcb_table (List.length pcb_table - 1)).nome)
+          end
+  | _ -> failwith "Intrução inválida\n"
