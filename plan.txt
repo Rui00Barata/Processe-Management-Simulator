@@ -1,0 +1,2 @@
+prog.prg 10 3
+prog2.prg 20 1
