@@ -2,6 +2,8 @@
 (*Modulos adicionais*)
 open Queue
 open String
+open Printf
+open List
 
 (*MEMORY MODEL*)
 type instruction = 
@@ -10,18 +12,20 @@ type instruction =
 	n : int;
 	nome : string
 }
+let memory = Array.make 1000 {ins = 'N'; n = 0; nome = ""}
+let next_memory_index = ref 0
 
 (*PROCESSS CONTROL BLOCK*)
 type pcb = 
 {
-	nome : string; 				(*nome do programa*)
-	start : int;					(*endereço da primeira instrução*)
-	variavel : int;				(*valor da variável*)
-	pid : int;						(*PID*)
-	ppid : int;						(*PPID*)
-	prioridade : int;			(*Prioridade do programa*)
-	pc : int;							(*Program Counter*)
-	estado : int					(*Estado do program: ready(0), running(1), blocked(2), terminated(3)*)
+	mutable nome : string; 				(*nome do programa*)
+	mutable start : int;					(*endereço da primeira instrução*)
+	mutable variavel : int;				(*valor da variável*)
+	mutable pid : int;						(*PID*)
+	mutable ppid : int;						(*PPID*)
+	mutable prioridade : int;			(*Prioridade do programa*)
+	mutable pc : int;							(*Program Counter*)
+	mutable estado : int					(*Estado do program: ready(0), running(1), blocked(2), terminated(3)*)
 }
 
 (*GESTOR DE PROCESSOS*)
@@ -31,7 +35,7 @@ let cpu = ref 0
 
 let next_pid = ref 1
 
-let process_list = ref []
+let pcb_table = ref [{nome = "filename"; start = !next_memory_index; variavel = 0; pid = !next_pid; ppid = 0; prioridade = 0; pc = 0; estado = 0}]
 
 let prontos = Queue.create
 
@@ -43,4 +47,3 @@ type running_state =
 	pid : int;						(*PID do processo em execução*)
 	pc : int							(*Program counter do processo*)
 }
-	

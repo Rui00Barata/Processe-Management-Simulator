@@ -1,10 +1,8 @@
 (*Simulacao de um processo*)
 (* Modulos *)
-Open Lib
+open Lib
 
 (*Variáveis*)
-let memory = Array.make 1000 {ins = 'N'; n = 0; nome = ""}
-let next_memory_index = ref 0
 
 (*{nome = "progenitor"; start = "0"; variavel = ; pid = ; ppid = ; prioridade = ; pc = ; estado = 0;}*)
 
@@ -41,6 +39,30 @@ let abrir filename =
         memory.(!next_memory_index) <- !instr;
         next_memory_index := !next_memory_index + 1;
       end
-      with End_of_file -> begin line := "EOF"; close_in fi; flag := false; process_list := !process_list@[process]; next_pid := !next_pid + 1 end
-  done;
+      with End_of_file -> begin line := "EOF"; close_in fi; flag := false; pcb_table := !pcb_table @ [process]; next_pid := !next_pid + 1 end
+  done
   
+let read_instr process =
+	let instr = memory.(process.start + process.pc) in
+  match instr.ins with
+  | 'M' -> (process.variavel <- instr.n; process.pc<-(process.pc+1))
+  | 'A' -> (process.variavel <- (process.variavel + instr.n); process.pc<-(process.pc+1)) 
+  | 'S' -> (process.variavel <- (process.variavel - instr.n); process.pc<-(process.pc+1)) 
+  | 'B' -> (process.estado <- 2; process.pc<-(process.pc+1))
+  | 'T' -> process.estado <- 3
+  | 'C' -> let proc = process in
+          begin
+            process.pc <- (process.pc + instr.n);
+            proc.pid <- !next_pid;
+            proc.ppid <- process.pid; 
+            next_pid := !next_pid + 1;
+            pcb_table := !pcb_table @ [proc]
+          end
+  | 'L' -> begin
+            (List.nth !pcb_table (List.length !pcb_table - 1)).nome <- instr.nome;
+            abrir (List.nth !pcb_table (List.length !pcb_table - 1)).nome;
+            process.pc<-(process.pc+1)
+          end
+  | _ -> Printf.fprintf stderr "Instrução inválida\n"
+  
+
