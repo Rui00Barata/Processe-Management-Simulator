@@ -5,41 +5,61 @@ open String
 open Printf
 open List
 
+(*Funções auxiliares*)
+let remove_CR str =
+  let n = String.length str in
+  if n > 0 && str.[n-1] = '\r' then
+    String.sub str 0 (n-1)
+  else
+    str
+
 (*MEMORY MODEL*)
 type instruction = 
 {
 	ins : char;
 	n : int;
-	nome : string
+	name : string
 }
-let memory = Array.make 1000 {ins = 'N'; n = 0; nome = ""}
+let memory = Array.make 1000 {ins = 'N'; n = 0; name = ""}
 let next_memory_index = ref 0
 
 (*PROCESSS CONTROL BLOCK*)
 type pcb = 
 {
-	mutable nome : string; 				(*nome do programa*)
-	mutable start : int;					(*endereço da primeira instrução*)
-	mutable variavel : int;				(*valor da variável*)
+	mutable name : string; 				(*Nome do programa*)
+	mutable start : int;					(*Endereço da primeira instrução*)
+	mutable variable : int;				(*Valor da variável*)
 	mutable pid : int;						(*PID*)
 	mutable ppid : int;						(*PPID*)
-	mutable prioridade : int;			(*Prioridade do programa*)
+	mutable priority : int;			  (*Prioridade do programa*)
+	mutable time : int;           (*Tempo de chegada*)
 	mutable pc : int;							(*Program Counter*)
-	mutable estado : int					(*Estado do program: ready(0), running(1), blocked(2), terminated(3)*)
+	mutable status : int					(*Estado do programa: ready(0), running(1), blocked(2), terminated(3)*)
 }
 
 (*GESTOR DE PROCESSOS*)
-let tempo = ref 0
+type newP = 
+{
+	name : string;
+	time : int;
+	priority: int;
+}
+
+let time = ref 0
+
+let time_quantum = ref 10
 
 let cpu = ref 0
 
 let next_pid = ref 1
 
-let pcb_table = ref [{nome = "filename"; start = !next_memory_index; variavel = 0; pid = !next_pid; ppid = 0; prioridade = 0; pc = 0; estado = 0}]
+let pcb_table = ref [{name = "filename"; start = !next_memory_index; variable = 0; pid = !next_pid; ppid = 0; priority = 0; time = 0; pc = 0; status = 0}]
 
-let prontos = Queue.create
+let newQ :newP Queue.t = Queue.create ()
 
-let blocked = Queue.create
+let readyQ :pcb  Queue.t = Queue.create ()
+
+let blockedQ :pcb  Queue.t = Queue.create ()
 
 type running_state = 
 {

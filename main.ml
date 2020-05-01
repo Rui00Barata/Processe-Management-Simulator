@@ -1,11 +1,18 @@
 open Lib
 
-let () = Sim.abrir "prog"
+(*let () = Sim.openfile "prog"
 let aux = (List.nth !pcb_table 1)
-let () = Printf.printf "Variavel = %d\n" aux.variavel 
+let () = Printf.printf "variable = %d\n" aux.variable
 let () = Sim.read_instr (List.nth !pcb_table 1)
 let aux = (List.nth !pcb_table 1)
-let () = Printf.printf "Variavel = %d\n" aux.variavel 
+let () = Printf.printf "variable = %d\n" aux.variable*)
+
+(*CLOCK*)
+(*while true do
+  short
+  instr
+  tempo++;
+done*)
 
 (*let menu op =
   let flag = ref true in
