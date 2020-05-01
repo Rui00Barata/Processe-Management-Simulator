@@ -28,7 +28,7 @@ let line_to_instr line =
 
 
 let abrir filename =
-  let process = {nome = filename; start = !next_memory_index; variavel = 0; pid = !next_pid; ppid = 0; prioridade = 0; pc = 0; estado = 0};
+  let process = {nome = filename; start = !next_memory_index; variavel = 0; pid = !next_pid; ppid = 0; prioridade = 0; pc = 0; estado = 0} in
   let fi = open_in (filename^".prg") in
   let flag = ref true in
   let line = ref "" in
@@ -42,14 +42,15 @@ let abrir filename =
         next_memory_index := !next_memory_index + 1;
       end
       with End_of_file -> begin line := "EOF"; close_in fi; flag := false; pcb_table := !pcb_table @ [process]; next_pid := !next_pid + 1 end
-  done;
+  done
   
-let read_instr instr process =
+let read_instr process =
+	let instr = memory.(process.start + process.pc) in
   match instr.ins with
-  | 'M' -> process.variavel <- instr.n
-  | 'A' -> process.variavel <- (process.variavel + instr.n) 
-  | 'S' -> process.variavel <- (process.variavel - instr.n) 
-  | 'B' -> process.estado <- 2
+  | 'M' -> (process.variavel <- instr.n; process.pc<-(process.pc+1))
+  | 'A' -> (process.variavel <- (process.variavel + instr.n); process.pc<-(process.pc+1)) 
+  | 'S' -> (process.variavel <- (process.variavel - instr.n); process.pc<-(process.pc+1)) 
+  | 'B' -> (process.estado <- 2; process.pc<-(process.pc+1))
   | 'T' -> process.estado <- 3
   | 'C' -> let proc = process in
           begin
@@ -60,7 +61,10 @@ let read_instr instr process =
             pcb_table := !pcb_table @ [proc]
           end
   | 'L' -> begin
-            (List.nth pcb_table (List.length pcb_table - 1)).nome <- instr.nome;
-            abrir ((List.nth pcb_table (List.length pcb_table - 1)).nome)
+            (List.nth !pcb_table (List.length !pcb_table - 1)).nome <- instr.nome;
+            abrir (List.nth !pcb_table (List.length !pcb_table - 1)).nome;
+            process.pc<-(process.pc+1)
           end
-  | _ -> failwith "Intrução inválida\n"
+  | _ -> Printf.fprintf stderr "Instrução inválida\n"
+  
+
