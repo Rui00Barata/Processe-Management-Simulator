@@ -5,7 +5,6 @@ Open Lib
 (*Variáveis*)
 let memory = Array.make 1000 {ins = 'N'; n = 0; nome = ""}
 let next_memory_index = ref 0
-let process_list = ref [](**)
 
 (*{nome = "progenitor"; start = "0"; variavel = ; pid = ; ppid = ; prioridade = ; pc = ; estado = 0;}*)
 
@@ -43,5 +42,5 @@ let abrir filename =
         next_memory_index := !next_memory_index + 1;
       end
       with End_of_file -> begin line := "EOF"; close_in fi; flag := false; process_list := !process_list@[process]; next_pid := !next_pid + 1 end
-  done
+  done;
   
