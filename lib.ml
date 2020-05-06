@@ -53,7 +53,9 @@ let cpu = ref 0
 
 let next_pid = ref 1
 
-let pcb_table = ref [{name = "filename"; start = !next_memory_index; variable = 0; pid = !next_pid; ppid = 0; priority = 0; time = 0; pc = 0; status = 0}]
+type pcb_list = pcb list ref
+
+let pcb_table : pcb_list = ref []
 
 let newQ :newP Queue.t = Queue.create ()
 
@@ -61,9 +63,13 @@ let readyQ :pcb  Queue.t = Queue.create ()
 
 let blockedQ :pcb  Queue.t = Queue.create ()
 
+let terminatedQ :pcb Queue.t = Queue.create ()
+
 type running_state = 
 {
 	ind : int;						(*Índice do PCBTabela*)
 	pid : int;						(*PID do processo em execução*)
 	pc : int							(*Program counter do processo*)
 }
+
+let running_proc = ref {ind = -1; pid = -1; pc = -1}
