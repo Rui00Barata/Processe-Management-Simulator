@@ -23,7 +23,7 @@ let read_plan  =
 
 let read_command c =
   match c with
-  |'E' -> Printf.printf "EXECUTE %d miliseconds" time_quantum 
+  |'E' -> short_sched
   |'I' -> Printf.printf "INTERRUPT\n"
   |'D' -> Printf.printf "LONG\n"
   |'R' -> Printf.printf "REPORT\n"
