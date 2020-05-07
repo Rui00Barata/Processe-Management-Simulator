@@ -10,9 +10,11 @@ let rec findProcInd queue pid count=
 let fcfs =
   let temp = Queue.pop readyQ in
   let ind = (findProcInd !pcb_table temp.pid 0) in
+  if (ind < 0) then print_endline "ERRO! O Processo nao existe na tabela" 
+  else
   begin
-    if (ind < 0) then print_endline "ERRO! O Processo nao existe na tabela" else execute !time_quantum ind;
-    match (List.nth (!pcb_table) ind).status with
-    | 1 -> Queue.push temp readyQ
-    | _ -> ()
-  end  
+    running_proc := {ind = ind; pid = p.pid; pc = p.pc};
+    temp.status <- 1;
+    Main.executing_flag := true;
+    Main.rem_time := time_quantum
+  end 
