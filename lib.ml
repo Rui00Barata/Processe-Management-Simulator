@@ -45,6 +45,14 @@ type newP =
 	priority: int;
 }
 
+let clock_flag = ref true
+
+let executing_flag = ref false
+
+let rem_time = ref 0
+
+let debug_mode = ref false
+
 let time = ref 0
 
 let time_quantum = ref 10
@@ -67,9 +75,9 @@ let terminatedQ :pcb Queue.t = Queue.create ()
 
 type running_state = 
 {
-	ind : int;						(*Índice do PCBTabela*)
-	pid : int;						(*PID do processo em execução*)
-	pc : int							(*Program counter do processo*)
+	mutable ind : int;						(*Índice do PCBTabela*)
+	mutable pid : int;						(*PID do processo em execução*)
+	mutable pc : int							(*Program counter do processo*)
 }
 
-let running_proc = ref {ind = -1; pid = -1; pc = -1}
+let running_proc = {ind = -1; pid = -1; pc = -1}

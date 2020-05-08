@@ -1,36 +1,33 @@
 (*Gestor de processos*)
 open Lib
 
-let debug_mode = ref false
+let fc = open_in "control.txt"
 
-let fi = open_in "control.txt"
-
-
-let read_plan  =
-  let fi = open_in "plan.txt" in
+let read_plan () =
+  let fp = open_in "plan.txt" in
   let flag = ref true in
   let line = ref "" in
   while (!flag) do
       try
         begin
-          line := remove_CR (input_line fi);
+          line := remove_CR (input_line fp);
           let args = (String.split_on_char ' ' !line) in
-          Queue.push ({name = List.nth args 0; time = int_of_string (List.nth args 1); priority = int_of_string (List.nth args 2)}) newQ
+          Queue.push ({name = List.nth args 0; time = int_of_string (List.nth args 1); priority = int_of_string (List.nth args 2)}) newQ;
         end
-      with End_of_file -> begin close_in fi; flag := false; end
+      with End_of_file -> begin close_in fp; flag := false end
   done
 
 
 let read_command c =
   match c with
-  |'E' -> short_sched
+  |'E' -> Short.short_sched ()
   |'I' -> Printf.printf "INTERRUPT\n"
-  |'D' -> Printf.printf "LONG\n"
+  |'D' -> Long.long_sched (Queue.length blockedQ)
   |'R' -> Printf.printf "REPORT\n"
   |'T' -> begin Printf.printf "TERMINATE\n"; exit 0 end
   | _ -> Printf.fprintf stderr "Comando inválido\n"
 
-let read_terminal =
+let read_terminal ()=
   let character = ref 'x' in
   try 
     begin 
@@ -48,7 +45,7 @@ let read_terminal =
 
 let read_control fi = 
   let character = ref 'x' in
-  try 
+  try
     let str = remove_CR (input_line fi) in
     if (String.length str) > 1 then
       Printf.fprintf stderr "Comando Inválido\n"
@@ -57,12 +54,14 @@ let read_control fi =
         character := str.[0];
         read_command !character
       end
-  with End_of_file -> close_in fi
+    with 
+    | End_of_file -> close_in fi;
+    | Sys_error s -> failwith "Fim do ficheiro control.txt. Considere adicionar \"T\" ao ficheiro control.txt"
 
 
 
-  let controller =
+  let controller () =
     if !debug_mode then
-      read_terminal
+      read_terminal ()
     else
-      read_control fi
+      read_control fc
