@@ -31,12 +31,13 @@ let openfile newP =
 let read_instr process =
   let instr = memory.(process.start + process.pc) in
   begin
+    (* Printf.printf "%d: %c\t%s\t%c\t%d\n" !time instr.ins process.name Process.(!buffercommand) process.status; *)
     (match instr.ins with
     | 'M' -> (process.variable <- instr.n; process.pc<-(process.pc+1))
     | 'A' -> (process.variable <- (process.variable + instr.n); process.pc<-(process.pc+1)) 
     | 'S' -> (process.variable <- (process.variable - instr.n); process.pc<-(process.pc+1)) 
-    | 'B' -> (process.status <- 2; process.pc<-(process.pc+1); executing_flag := false; rem_time := 0; running_proc.ind <- (Short.findProcInd !pcb_table process.pid 0); running_proc.pid <- process.pid; running_proc.pc <- process.pc)
-    | 'T' -> (process.status <- 3; process.pc<-(process.pc+1); executing_flag := false; rem_time := 0; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; process.finish <- !time)
+    | 'B' -> (process.status <- 2; process.pc<-(process.pc+1); executing_flag := false; rem_time := 1; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1)
+    | 'T' -> (process.status <- 3; process.pc<-(process.pc+1); executing_flag := false; rem_time := 1; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; process.finish <- !time)
     | 'C' -> let proc = process in
             begin
               process.pc <- (process.pc + instr.n);
@@ -51,6 +52,7 @@ let read_instr process =
               process.pc<-(process.pc+1)
             end
     | _ -> Printf.fprintf stderr "Instrução inválida\n");
+    (* Printf.printf "%d: %c\t%s\t%c\t%d\n" !time instr.ins process.name Process.(!buffercommand) process.status; *)
     running_proc.pc <- process.pc
   end
 

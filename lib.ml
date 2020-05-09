@@ -63,7 +63,7 @@ let debug_mode = ref false
 
 let time = ref 0
 
-let time_quantum = ref 10
+let time_quantum = ref 2
 
 let cpu = ref 0
 
