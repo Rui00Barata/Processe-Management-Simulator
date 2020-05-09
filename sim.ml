@@ -12,7 +12,7 @@ let line_to_instr line =
 
 
 let openfile newP =
-  let process = {name = String.sub newP.name 0 (String.length newP.name - 4); start = !next_memory_index; variable = 0; pid = !next_pid; ppid = 0; priority = newP.priority; time = newP.time; pc = 0; status = 0} in
+  let process = {name = String.sub newP.name 0 (String.length newP.name - 4); start = !next_memory_index; variable = 0; pid = !next_pid; ppid = 0; priority = newP.priority; time = newP.time; pc = 0; status = 0; finish = 0} in
   let fi = open_in (newP.name) in
   let flag = ref true in
   let line = ref "" in
@@ -35,8 +35,8 @@ let read_instr process =
     | 'M' -> (process.variable <- instr.n; process.pc<-(process.pc+1))
     | 'A' -> (process.variable <- (process.variable + instr.n); process.pc<-(process.pc+1)) 
     | 'S' -> (process.variable <- (process.variable - instr.n); process.pc<-(process.pc+1)) 
-    | 'B' -> (process.status <- 2; process.pc<-(process.pc+1); executing_flag := false; rem_time := 0; running_proc.ind <- (Short.findProcInd !pcb_table process.pid 0); running_proc.pid <- process.pid; running_proc.pc <- process.pc; Queue.push (List.nth !pcb_table running_proc.ind) blockedQ)
-    | 'T' -> (process.status <- 3; process.pc<-(process.pc+1); executing_flag := false; rem_time := 0; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; Queue.push process terminatedQ)
+    | 'B' -> (process.status <- 2; process.pc<-(process.pc+1); executing_flag := false; rem_time := 0; running_proc.ind <- (Short.findProcInd !pcb_table process.pid 0); running_proc.pid <- process.pid; running_proc.pc <- process.pc)
+    | 'T' -> (process.status <- 3; process.pc<-(process.pc+1); executing_flag := false; rem_time := 0; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; process.finish <- !time)
     | 'C' -> let proc = process in
             begin
               process.pc <- (process.pc + instr.n);

@@ -3,19 +3,20 @@ open Lib
 let clock () = 
   while(!clock_flag) do
     begin
-      while (Queue.peek newQ).time = !time do
+      (* Printf.printf "clock: %d\t" !time;
+      Printf.printf "%c\n" Process.(!buffercommand); *)
+      while not (Queue.is_empty newQ) && (Queue.peek newQ).time = !time do
         Sim.openfile (Queue.pop newQ)
       done;
-      if not !executing_flag then
-        Process.controller ();
+      if not !executing_flag then Process.controller ();
       if (!executing_flag && (!rem_time > 0)) then
         begin
           Exec.execute running_proc.ind;
           if !rem_time = 0 then executing_flag := false
         end;
       time := !time + 1;
-      Printf.printf "run: %d\n" running_proc.ind;
-      Printf.printf "pc: %d\n" running_proc.pc;
+      (* Printf.printf "run: %d\n" running_proc.ind;
+      Printf.printf "pc: %d\n" running_proc.pc; *)
       (* Printf.printf "v: %d\n" (List.nth !pcb_table running_proc.ind).variable *)
     end
   done
@@ -57,7 +58,7 @@ let menu () =
     while !flag do
       Printf.printf "Menu\n\n1 - Iniciar\n2 - Opções\n\n0 - Sair\n";
       match (read_int ()) with
-      | 1 -> clock ()
+      | 1 -> (clock (); flag := false)
       | 2 -> options_menu ()
       | 0 -> exit 0 
       | _ -> ()

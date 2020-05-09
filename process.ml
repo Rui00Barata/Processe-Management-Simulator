@@ -2,6 +2,7 @@
 open Lib
 
 let fc = open_in "control.txt"
+let buffercommand = ref '$'
 
 let read_plan () =
   let fp = open_in "plan.txt" in
@@ -18,13 +19,13 @@ let read_plan () =
   done
 
 
-let read_command c =
+let read_command c = 
   match c with
-  |'E' -> Short.short_sched ()
+  |'E' -> if Queue.is_empty readyQ then buffercommand := 'E' else (Short.short_sched (); buffercommand := '$')
   |'I' -> Printf.printf "INTERRUPT\n"
   |'D' -> Long.long_sched (Queue.length blockedQ)
-  |'R' -> Printf.printf "REPORT\n"
-  |'T' -> begin Printf.printf "TERMINATE\n"; exit 0 end
+  |'R' -> Report.report ()
+  |'T' -> begin Report.report (); clock_flag := false; exit 0 end
   | _ -> Printf.fprintf stderr "Comando inválido\n"
 
 let read_terminal ()=
@@ -61,7 +62,6 @@ let read_control fi =
 
 
   let controller () =
-    if !debug_mode then
-      read_terminal ()
-    else
-      read_control fc
+    if !buffercommand = '$' then
+      if !debug_mode then read_terminal () else read_control fc
+    else if Queue.is_empty newQ then (read_command !buffercommand; buffercommand := '$' ) else read_command !buffercommand
