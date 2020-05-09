@@ -25,7 +25,7 @@ let read_command c =
   |'I' -> Printf.printf "INTERRUPT\n"
   |'D' -> Long.long_sched (Queue.length blockedQ)
   |'R' -> Report.report ()
-  |'T' -> begin Report.report (); clock_flag := false; exit 0 end
+  |'T' -> begin Report.global_report (); clock_flag := false; exit 0 end
   | _ -> Printf.fprintf stderr "Comando inválido\n"
 
 let read_terminal ()=
