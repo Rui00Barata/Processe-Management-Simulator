@@ -18,14 +18,22 @@ let read_plan () =
       with End_of_file -> begin close_in fp; flag := false end
   done
 
+let interrupt () = 
+  begin
+    Queue.push (List.nth !pcb_table running_proc.ind) blockedQ;
+    running_proc.ind <- -1;
+    running_proc.pid <- -1;
+    running_proc.pc <- -1;
+    executing_flag := false
+  end
 
 let read_command c = 
   match c with
-  |'E' -> if Queue.is_empty readyQ then buffercommand := 'E' else (Short.short_sched (); buffercommand := '$')
-  |'I' -> Printf.printf "INTERRUPT\n"
+  |'E' -> if Queue.is_empty readyQ then if (running_proc.ind <> -1) then (rem_time := !time_quantum; executing_flag := true; buffercommand := '$') else if (not (Queue.is_empty newQ)) then buffercommand := 'E' else () else (Short.short_sched (); rem_time := !time_quantum; executing_flag := true; buffercommand := '$')
+  |'I' -> interrupt ()
   |'D' -> Long.long_sched (Queue.length blockedQ)
   |'R' -> Report.report ()
-  |'T' -> begin Report.report (); clock_flag := false; exit 0 end
+  |'T' -> begin Report.global_report (); clock_flag := false; exit 0 end
   | _ -> Printf.fprintf stderr "Comando inválido\n"
 
 let read_terminal ()=
