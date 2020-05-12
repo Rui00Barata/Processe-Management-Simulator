@@ -39,7 +39,8 @@ type pcb =
 	mutable pid : int;						(*PID*)
 	mutable ppid : int;						(*PPID*)
 	mutable priority : int;			  (*Prioridade do programa*)
-	mutable time : int;           (*Tempo de chegada*)
+	mutable arrival_time : int;   (*Tempo de chegada*)
+	mutable time : int;						(*Tempo de execução*)
 	mutable pc : int;							(*Program Counter*)
 	mutable status : int;					(*Estado do programa: ready(0), running(1), blocked(2), terminated(3)*)
 	mutable finish : int					(*Tempo em que o processo termina*)
@@ -59,11 +60,15 @@ let executing_flag = ref false
 
 let rem_time = ref 0
 
+let time_flag = ref false
+
 let debug_mode = ref false
+
+let son_flag = ref false
 
 let time = ref 0
 
-let time_quantum = ref 2
+let time_quantum = ref 10
 
 let cpu = ref 0
 

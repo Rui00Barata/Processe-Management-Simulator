@@ -21,7 +21,6 @@ let fcfs () =
   if (ind < 0) then print_endline "ERRO! O Processo nao existe na tabela" 
   else
     begin
-      (* Printf.printf "FCFS!!!"; *)
       running_proc.ind <- ind;
       running_proc.pid <- temp.pid;
       running_proc.pc <- temp.pc;
@@ -33,8 +32,4 @@ let short_sched () =
     (match !selected_scheduller with
     |1 -> fcfs ()
     |_ -> fcfs ());
-    Printf.printf "ihateyou";
-    executing_flag := true;
-    rem_time := !time_quantum;
-    Printf.printf "ihateyou2";
   end

@@ -3,22 +3,16 @@ open Lib
 let clock () = 
   while(!clock_flag) do
     begin
-      Printf.printf "%d: flag: %B\t" !time !executing_flag;
-      (* Printf.printf "clock: %d\t" !time;
-      Printf.printf "%c\n" Process.(!buffercommand); *)
       while not (Queue.is_empty newQ) && (Queue.peek newQ).time = !time do
-        Sim.openfile (Queue.pop newQ)
+        Sim.openfile (Queue.pop newQ);
       done;
-      if not !executing_flag then Process.controller ();
-      if ((running_proc.ind <> -1) || !executing_flag && (!rem_time > 0)) then (* mudamos if *)
-        begin
-          Exec.execute running_proc.ind;
-          if !rem_time = 0 then executing_flag := false
-        end;
-      time := !time + 1;
-      (* Printf.printf "run: %d\n" running_proc.ind;
-      Printf.printf "pc: %d\n" running_proc.pc; *)
-      (* Printf.printf "v: %d\n" (List.nth !pcb_table running_proc.ind).variable *)
+      if (not !executing_flag) then Process.controller ();
+      if (!executing_flag && (!rem_time > 0)) then
+      begin
+        Exec.execute running_proc.ind;
+        if !rem_time = 0 then executing_flag := false
+      end;
+      if ((Process.(!buffercommand) <> '$') || (running_proc.ind <> -1) || (!time_flag)) then (time := !time + 1; time_flag := false);
     end
   done
 

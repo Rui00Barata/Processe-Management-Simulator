@@ -28,14 +28,13 @@ let interrupt () =
   end
 
 let read_command c = 
-  (Queue.iter (fun (x : pcb) -> Printf.printf " %s\t" x.name) readyQ;
   match c with
-  |'E' -> if Queue.is_empty readyQ then buffercommand := 'E' else (Short.short_sched (); buffercommand := '$')
+  |'E' -> if Queue.is_empty readyQ then if (running_proc.ind <> -1) then (rem_time := !time_quantum; executing_flag := true; buffercommand := '$') else if (not (Queue.is_empty newQ)) then buffercommand := 'E' else () else (Short.short_sched (); rem_time := !time_quantum; executing_flag := true; buffercommand := '$')
   |'I' -> interrupt ()
   |'D' -> Long.long_sched (Queue.length blockedQ)
   |'R' -> Report.report ()
   |'T' -> begin Report.global_report (); clock_flag := false; exit 0 end
-  | _ -> Printf.fprintf stderr "Comando inválido\n")
+  | _ -> Printf.fprintf stderr "Comando inválido\n"
 
 let read_terminal ()=
   let character = ref 'x' in
