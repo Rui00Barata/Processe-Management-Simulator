@@ -8,12 +8,6 @@ let rec findProcInd (queue : pcb list) pid count =
 
 let selected_scheduller = ref 1
 
-(*  match (List.nth (!pcb_table) ind).status with
-    | 1 -> Queue.push temp readyQ
-    | _ -> () *)
-
-(* 1 -> fcfs *)
-
 let fcfs () =
   if running_proc.ind = -1 then
   let temp = Queue.pop readyQ in
@@ -30,6 +24,6 @@ let fcfs () =
 let short_sched () =
   begin
     (match !selected_scheduller with
-    |1 -> fcfs ()
+    |1 -> fcfs ()                                                             (* 1 -> fcfs *)
     |_ -> fcfs ());
   end

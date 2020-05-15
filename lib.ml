@@ -14,11 +14,11 @@ let remove_CR str =
     str
 
 type running_state = 
-	{
-		mutable ind : int;						(*Índice do PCBTabela*)
-		mutable pid : int;						(*PID do processo em execução*)
-		mutable pc : int							(*Program counter do processo*)
-	}
+{
+	mutable ind : int;						(*Índice do PCBTabela*)
+	mutable pid : int;						(*PID do processo em execução*)
+	mutable pc : int							(*Program counter do processo*)
+}
 
 (*MEMORY MODEL*)
 type instruction = 
@@ -70,8 +70,6 @@ let time = ref 0
 
 let time_quantum = ref 10
 
-let cpu = ref 0
-
 let next_pid = ref 1
 
 type pcb_list = pcb list ref
@@ -80,9 +78,9 @@ let pcb_table : pcb_list = ref []
 
 let newQ :newP Queue.t = Queue.create ()
 
-let readyQ :pcb  Queue.t = Queue.create ()
+let readyQ :pcb Queue.t = Queue.create ()
 
-let blockedQ :pcb  Queue.t = Queue.create ()
+let blockedQ :pcb Queue.t = Queue.create ()
 
 let terminatedQ :pcb Queue.t = Queue.create ()
 

@@ -19,7 +19,7 @@ let clock () =
 let scheduling_menu () =
   let flag = ref true in
   while !flag do
-  begin
+    begin
       Sys.command "clear";
       for i = 0 to 70 do print_char '-' done;
       (Printf.printf "\n|\n|\tEscalonamento selecionado:   %s\n|\tTipo de escalonamento:       %s\n" 
@@ -80,8 +80,8 @@ let menu () =
   done
 
 let () = 
-    if (Array.length Sys.argv < 2) then
-      menu ()
-    else
-        if Sys.argv.(1) = "-d" then (debug_mode := true; menu () )
-        else failwith "Opção inválida. Talvez queira utilizar \"-d\"\n"
+  if (Array.length Sys.argv < 2) then
+    menu ()
+  else
+    if Sys.argv.(1) = "-d" then (debug_mode := true; menu () )
+    else failwith "Opção inválida. Talvez queira utilizar \"-d\"\n"
