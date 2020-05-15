@@ -11,3 +11,7 @@ Como compilar e executar:
 - Execução: 
     - Modo normal (Usa o control.txt): ./Simulador
     - Modo debug (Usa a terminal): ./Simulador -d
+    
+
+
+12-5-2020 ----- Done First Milestone.
