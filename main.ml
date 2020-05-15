@@ -3,7 +3,6 @@ open Lib
 let clock () = 
   while(!clock_flag) do
     begin
-      Printf.printf "%d:" !time;
       while not (Queue.is_empty newQ) && (Queue.peek newQ).time = !time do
         Sim.openfile (Queue.pop newQ);
       done;
