@@ -5,7 +5,7 @@ let print_queue process_queue =
   Queue.iter (fun x -> Printf.printf "ppid = %d, pid = %d, prioridade = %d, 
   valor da variável = %d, tempo de início = %d, tempo de fim = %d, tempo usado do CPU = %d\n\n" x.ppid x.pid x.priority x.variable x.arrival_time x.finish x.time) process_queue
 
-  let report () =
+let report () =
   begin
     Printf.printf "\nTEMPO ATUAL: %d\n\nPROCESSO EM EXECUÇÃO:\n" !time;
     if running_proc.ind > 0 then

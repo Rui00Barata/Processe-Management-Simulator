@@ -63,9 +63,9 @@ let read_control fi =
         character := str.[0];
         read_command !character
       end
-    with 
-    | End_of_file -> close_in fi;
-    | Sys_error s -> failwith "Fim do ficheiro control.txt. Considere adicionar \"T\" ao ficheiro control.txt"
+  with 
+  | End_of_file -> close_in fi;
+  | Sys_error s -> failwith "Fim do ficheiro control.txt. Considere adicionar \"T\" ao ficheiro control.txt"
 
 
 

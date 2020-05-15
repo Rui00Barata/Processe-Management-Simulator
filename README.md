@@ -1,5 +1,13 @@
 # Operatings Systems Project
 
-Olá pessoal!
-Isto é um ficheiro de teste que eu fiz para vos relembrar que é para termos 20 neste projeto!
-Bom trabalho a todos!
+Como utilizar o simulador: Alterar o plan.txt e o control.txt de forma a executar os processos que se planeia executar.
+Criar ficheiros do tipo .prg com o formato: “ins n/name” (ins : char; n : int; name : string;).
+
+
+Como compilar e executar:
+ - Compilação:
+    - make
+    - make cleanup
+- Execução: 
+    - Modo normal (Usa o control.txt): ./Simulador
+    - Modo debug (Usa a terminal): ./Simulador -d
