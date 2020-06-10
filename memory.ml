@@ -46,6 +46,29 @@ let rec has_memory_available i n =
           i := !i + 1
     done in !i
 
+(* Next-fit *)
+let next_fit_index = ref 0
+
+let next_allocate n pid =
+  let flag = ref true in
+  let i = ref 0 in
+  let () = while !flag do
+    if (has_memory_available (!next_fit_index) (n)) then  (* enc *)
+      begin
+      for j = !next_fit_index to (n - 1 + !next_fit_index) do
+        !heap.(j) <- pid;
+        next_fit_index := !next_fit_index + 1
+      done;
+      flag := false;
+      i := !i + 1
+      end       
+    else 
+      if (!next_fit_index = Array.length !heap) then begin flag := false; i := (-1) end
+      else
+        (i := !i + 1;
+        next_fit_index := !next_fit_index + 1)
+  done in !i
+  
 (*  *)
 
 let allocate_mem op n pid =
