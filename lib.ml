@@ -29,6 +29,7 @@ type instruction =
 }
 let memory = Array.make 1000 {ins = 'N'; n = 0; name = ""}
 let next_memory_index = ref 0
+let heap = ref (Array.make 128 (-1))
 
 (*PROCESSS CONTROL BLOCK*)
 type pcb = 

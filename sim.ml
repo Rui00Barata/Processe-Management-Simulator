@@ -102,6 +102,8 @@ let read_instr process =
                   process.pc <- 0;
                   openfile_string instr.name;
                 end
+    | 'H' -> ()
+    | 'D' -> Memory.deallocate_mem (running_proc.pid) (* NO T!! *)
     | _ -> Printf.fprintf stderr "Instrução inválida\n");
     running_proc.pc <- process.pc
   end

@@ -24,7 +24,7 @@ let scheduling_menu () =
       for i = 0 to 70 do print_char '-' done;
       (Printf.printf "\n|\n|\tEscalonamento selecionado:   %s\n|\tTipo de escalonamento:       %s\n" 
       (match Short.(!selected_scheduller) with | 1 -> "First Come First Serve" | _ -> "First Come First Serve")
-      (if true then "Não preemptivo" else "Preemptivo"));
+      "Não preemptivo");
       (Printf.printf "|\tTime Quantum:                %d\n|\tModo de Debug:               %s" !time_quantum 
       (if !debug_mode then "Ativado" else "Desativado"));
       Printf.printf "\n|\n|\n|\tMenu de Escalonamento\n|\n|\t1 - FCFS\n|\n|\t0 - Voltar ao Menu de Opções\n|\n|\tSELECT: ";
@@ -35,6 +35,32 @@ let scheduling_menu () =
       | _ -> ());
     end
   done
+
+  let scheduling_menup () =
+    let flag = ref true in
+    while !flag do
+      begin
+        Sys.command "clear";
+        for i = 0 to 70 do print_char '-' done;
+        (Printf.printf "\n|\n|\tEscalonamento selecionado:   %s\n|\tTipo de escalonamento:       %s\n" 
+        (match Short.(!selected_scheduller) with | 1 -> "First Come First Serve" | _ -> "First Come First Serve")
+        "Preemptivo");
+        (Printf.printf "|\tTime Quantum:                %d\n|\tModo de Debug:               %s" !time_quantum 
+        (if !debug_mode then "Ativado" else "Desativado"));
+        Printf.printf "\n|\n|\n|\tMenu de Escalonamento\n|\n|\t1 - Priority\n|\n|\t0 - Voltar ao Menu de Opções\n|\n|\tSELECT: ";
+        let op = read_int () in
+        (match op with
+        | 1 -> (flag := false; Short.selected_scheduller := 3)
+        | 0 -> flag := false
+        | _ -> ());
+      end
+    done
+
+let memory_management_ () =
+  (* Printf.printf "Qual o tamanho pretendido para a memória dinâmica?" *)
+  let op1 = read_int () in
+  let op2 = read_int () in
+  heap := Array.make (op1/op2) (-1)
 
 let options_menu () =
   let flag = ref true in
@@ -51,8 +77,9 @@ let options_menu () =
       let op = read_int () in
       (match op with
       | 1 -> scheduling_menu ()
-      | 2 -> Printf.printf " ---------- Work in Progress ----------\n"
+      | 2 -> scheduling_menup ()
       | 3 -> begin Printf.printf "|\n|\tInsira o novo valor do Time Quantum: "; time_quantum := read_int () end
+      | 4 -> memory_management ()
       | 0 -> flag := false
       | _ -> ());
     end
