@@ -69,7 +69,45 @@ let next_allocate n pid =
         next_fit_index := !next_fit_index + 1)
   done in !i
   
-(*  *)
+(* Best-Fit *)
+let best_allocate n pid =
+  let aux = ref 0 in
+  let ind = ref (-1) in
+  let min = ref (max_int) in
+  let count = ref 0 in
+  let () = 
+    for i = 0 to (Array.length !heap) - 1 do
+      if i = (Array.length !heap - 1) && !min >= !count && !count >= n then ind := !aux + 1; 
+      if !heap.(i) = -1 then count := !count + 1
+      else if !count >= n && !min > !count then (min := !count; ind := i - !count; count := 0; aux := i)
+      else (count := 0; aux := i);
+    done;
+    if !ind <> (-1) then
+      for i = !ind to !ind + n - 1 do
+        !heap.(i) <- pid
+      done
+    else () in !ind
+
+(* Worst Fit *)
+let worst_allocate n pid = 
+  let countIndex = ref (-1) in
+  let count = ref 0 in
+  let max = ref 0 in 
+  let maxIndex = ref (-1) in
+  begin 
+    Printf.printf "f1\n";
+    for i=0 to ((Array.length !heap) - 1) do
+      if(!heap.(i) <> -1)
+      then ((if !count > !max then (max := !count; maxIndex := !countIndex;));count := 0;countIndex := -1)
+      else ((if !countIndex = -1 then countIndex := i); count := !count +1;)
+    done;
+    if !count > !max then (max := !count; maxIndex := !countIndex;);
+    if (has_memory_available (!maxIndex) (n))
+    then 
+      for i = !maxIndex to (!maxIndex + n - 1) do
+        !heap.(i) <- pid
+      done;
+  end
 
 let allocate_mem op n pid =
   match op with
