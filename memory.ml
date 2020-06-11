@@ -69,7 +69,24 @@ let next_allocate n pid =
         next_fit_index := !next_fit_index + 1)
   done in !i
   
-(*  *)
+(* Best-Fit *)
+let best_allocate n pid =
+  let aux = ref 0 in
+  let ind = ref (-1) in
+  let min = ref (max_int) in
+  let count = ref 0 in
+  let () = 
+    for i = 0 to (Array.length !heap) - 1 do
+      if i = (Array.length !heap - 1) && !min >= !count && !count >= n then ind := !aux + 1; 
+      if !heap.(i) = -1 then count := !count + 1
+      else if !count >= n && !min > !count then (min := !count; ind := i - !count; count := 0; aux := i)
+      else (count := 0; aux := i);
+    done;
+    if !ind <> (-1) then
+      for i = !ind to !ind + n - 1 do
+        !heap.(i) <- pid
+      done
+    else () in !ind
 
 let allocate_mem op n pid =
   match op with
