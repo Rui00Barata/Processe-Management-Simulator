@@ -32,7 +32,7 @@ let rec has_memory_available i n =
     let flag = ref true in
     let i = ref 0 in
     let () = while !flag do
-      if (has_memory_available (!i) (n)) then
+      if (has_memory_available (!i) (n)) then  (* enc *)
         begin
         for j = !i to (n - 1 + !i) do
           !heap.(j) <- pid
@@ -53,7 +53,7 @@ let next_allocate n pid =
   let flag = ref true in
   let i = ref 0 in
   let () = while !flag do
-    if (has_memory_available (!next_fit_index) (n)) then
+    if (has_memory_available (!next_fit_index) (n)) then  (* enc *)
       begin
       for j = !next_fit_index to (n - 1 + !next_fit_index) do
         !heap.(j) <- pid;
@@ -77,24 +77,28 @@ let best_allocate n pid =
   let count = ref 0 in
   let () = 
     for i = 0 to (Array.length !heap) - 1 do
-      if i = (Array.length !heap - 1) && !min >= !count && !count >= n then if !aux = 0 then ind := !aux else ind := !aux + 1; 
-      if !heap.(i) = -1 then count := !count + 1
-      else if !count >= n && !min > !count then (min := !count; ind := i - !count; count := 0; aux := i)
-      else (count := 0; aux := i);
+      (if !heap.(i) = -1 then (count := !count + 1)
+      else (if !count >= n && !min > !count then (min := !count; ind := i - !count; count := 0; aux := i)
+      else (count := 0; aux := i)));
+      (if i = (Array.length !heap - 1) && !min >= !count && !count >= n then (ind := i - !count + 1; min := !count)); 
+      Printf.printf "%d\t%d\t%d\t%d\n" i !count !min !ind;
     done;
     if !ind <> (-1) then
       for i = !ind to !ind + n - 1 do
         !heap.(i) <- pid
       done
-    else () in if !ind = -1 then (-1) else (Array.length !heap)
+    else () in !ind
 
-(* Worst Fit *)
+  
+
+  (* Worst Fit *)
 let worst_allocate n pid = 
   let countIndex = ref (-1) in
   let count = ref 0 in
   let max = ref 0 in 
   let maxIndex = ref (-1) in
-  let () = begin
+  begin 
+    Printf.printf "f1\n";
     for i=0 to ((Array.length !heap) - 1) do
       if(!heap.(i) <> -1)
       then ((if !count > !max then (max := !count; maxIndex := !countIndex;));count := 0;countIndex := -1)
@@ -106,12 +110,9 @@ let worst_allocate n pid =
       for i = !maxIndex to (!maxIndex + n - 1) do
         !heap.(i) <- pid
       done;
-  end in if !maxIndex = -1 then (-1) else (Array.length !heap)
+  end
 
 let allocate_mem op n pid =
   match op with
   |1 -> first_allocate n pid
-  |2 -> next_allocate n pid
-  |3 -> best_allocate n pid
-  |4 -> worst_allocate n pid
   |_ ->first_allocate n pid
