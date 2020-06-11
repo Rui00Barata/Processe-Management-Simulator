@@ -5,6 +5,7 @@ let clock () =
     begin
       while not (Queue.is_empty newQ) && (Queue.peek newQ).time = !time do
         Sim.openfile (Queue.pop newQ);
+        preempt_flag := true
       done;
       if (not !executing_flag) then Process.controller ();
       if (!executing_flag && (!rem_time > 0)) then
@@ -13,6 +14,7 @@ let clock () =
         if !rem_time = 0 then executing_flag := false
       end;
       if ((Process.(!buffercommand) <> '$') || (running_proc.ind <> -1) || (!time_flag)) then (time := !time + 1; time_flag := false);
+      preempt_flag := false;
     end
   done
 

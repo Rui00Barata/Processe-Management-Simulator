@@ -67,6 +67,8 @@ let debug_mode = ref false
 
 let son_flag = ref false
 
+let preempt_flag = ref false
+
 let time = ref 0
 
 let time_quantum = ref 10
