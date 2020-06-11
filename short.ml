@@ -52,6 +52,19 @@ let priority_p () =
       p.status <- 1;
     end
 
+let round_robin () = 
+  let temp = Queue.pop readyQ in
+  let ind = (findProcInd !pcb_table temp.pid 0) in
+  if (ind < 0) then print_endline "ERRO! O Processo nao existe na tabela"
+  else
+    begin
+      if runnning_proc.ind <> -1 then ((List.nth !pcb_table running_proc.ind).status <- 0; Queue.push (List.nth !pcb_table running_proc.ind) readyQ);
+      running_proc.ind <- ind;
+      running_proc.pid <- temp.pid;
+      running_proc.pc <- temp.pc;
+      temp.status <- 1;
+    end
+
 let short_sched () =
   match !selected_scheduller with
   |1 -> fcfs ()                                                             (* First Come First Serve *)
