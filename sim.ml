@@ -11,7 +11,7 @@ let line_to_instr line =
     else {ins = 'E';n = 0;name = ""}
 
 let copy_process (p : pcb) = 
-  {name = p.name; start = p.start; variable = p.variable; pid = !next_pid; ppid = p.pid; priority = p.priority; arrival_time = !time + 1; time = 0; pc = (p.pc + 1); status = 1; finish = -1}
+  {name = p.name; start = p.start; variable = p.variable; pid = !next_pid; ppid = p.pid; priority = p.priority; arrival_time = !time + 1; burst_time = p.burst_time; time = 0; pc = (p.pc + 1); status = 1; finish = -1}
 
 let rec find_process_name s i =
   if (i = List.length !pcb_table) then -1
@@ -23,15 +23,16 @@ let openfile newP =
     if (ind <> -1) then
       begin
         let p = List.nth !pcb_table ind in
-        let process = {name = String.sub newP.name 0 (String.length newP.name - 4); start = p.start; variable = 0; pid = !next_pid; ppid = 0; priority = newP.priority; arrival_time = newP.time; time = 0; pc = 0; status = 0; finish = -1} in
+        let process = {name = String.sub newP.name 0 (String.length newP.name - 4); start = p.start; variable = 0; pid = !next_pid; ppid = 0; priority = newP.priority; arrival_time = newP.time; burst_time = p.burst_time; time = 0; pc = 0; status = 0; finish = -1} in
         next_pid := !next_pid + 1;
         pcb_table := !pcb_table @ [process]; 
         Queue.push process readyQ
       end
     else
-      let process = {name = String.sub newP.name 0 (String.length newP.name - 4); start = !next_memory_index; variable = 0; pid = !next_pid; ppid = 0; priority = newP.priority; arrival_time = newP.time; time = 0; pc = 0; status = 0; finish = -1} in
+      let process = {name = String.sub newP.name 0 (String.length newP.name - 4); start = !next_memory_index; variable = 0; pid = !next_pid; ppid = 0; priority = newP.priority; arrival_time = newP.time; burst_time = 0; time = 0; pc = 0; status = 0; finish = -1} in
       let fi = open_in (newP.name) in
       let flag = ref true in
+      let burst = ref 0 in
       let line = ref "" in
       let instr = ref {ins = 'N'; n = 0; name = ""} in
       while (!flag) do
@@ -41,8 +42,9 @@ let openfile newP =
             instr := line_to_instr !line;
             memory.(!next_memory_index) <- !instr;
             next_memory_index := !next_memory_index + 1;
+            burst := !burst + 1
           end
-        with End_of_file -> begin close_in fi; flag := false; pcb_table := !pcb_table @ [process]; Queue.push process readyQ; next_pid := !next_pid + 1 end
+        with End_of_file -> begin process.burst_time <- !burst ;close_in fi; flag := false; pcb_table := !pcb_table @ [process]; Queue.push process readyQ; next_pid := !next_pid + 1 end
       done
 
 let openfile_string str =

@@ -41,6 +41,7 @@ type pcb =
 	mutable ppid : int;						(*PPID*)
 	mutable priority : int;			  (*Prioridade do programa*)
 	mutable arrival_time : int;   (*Tempo de chegada*)
+	mutable burst_time : int;     (*Tempo necessário para executar*)
 	mutable time : int;						(*Tempo de execução*)
 	mutable pc : int;							(*Program Counter*)
 	mutable status : int;					(*Estado do programa: ready(0), running(1), blocked(2), terminated(3)*)
