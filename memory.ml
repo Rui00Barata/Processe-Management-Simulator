@@ -77,10 +77,10 @@ let best_allocate n pid =
   let count = ref 0 in
   let () = 
     for i = 0 to (Array.length !heap) - 1 do
-      (if !heap.(i) = -1 then count := !count + 1
+      (if !heap.(i) = -1 then (count := !count + 1)
       else (if !count >= n && !min > !count then (min := !count; ind := i - !count; count := 0; aux := i)
       else (count := 0; aux := i)));
-      (if i = (Array.length !heap - 1) && !min >= !count && !count >= n then ind := !aux); 
+      (if i = (Array.length !heap - 1) && !min >= !count && !count >= n then (ind := i - !count + 1; min := !count)); 
       Printf.printf "%d\t%d\t%d\t%d\n" i !count !min !ind;
     done;
     if !ind <> (-1) then

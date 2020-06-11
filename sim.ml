@@ -69,11 +69,11 @@ let read_instr process =
     | 'A' -> (process.variable <- (process.variable + instr.n); process.pc<-(process.pc+1)) 
     | 'S' -> (process.variable <- (process.variable - instr.n); process.pc<-(process.pc+1)) 
     | 'B' -> (process.status <- 2; process.pc <- (process.pc+1); 
-              if (not !son_flag) then (executing_flag := false; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1)
+              if (not !son_flag) then (executing_flag := false; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; preemp_flag := true;)
               else (son_flag := false; running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc))
     | 'T' -> (if (!son_flag) 
                 then (son_flag := false; running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc)
-                else (running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1);
+                else (running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1); preemp_flag := true;
                   process.status <- 3; process.pc<-(process.pc+1); executing_flag := false; rem_time := 1; process.finish <- (!time + 1))
     | 'C' -> let filho = copy_process process in
               begin
