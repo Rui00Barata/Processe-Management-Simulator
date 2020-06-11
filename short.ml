@@ -52,6 +52,18 @@ let priority_p () =
       p.status <- 1;
     end
 
+let priority () =
+  let p = findHighestPriority () in
+  let ind = findProcInd !pcb_table p.pid 0 in
+  if ind < 0 then print_endline "ERRO! O Processo nao existe na tabela"
+  else
+    begin
+      running_proc.ind <- ind;
+      running_proc.pid <- p.pid;
+      running_proc.pc <- p.pc;
+      p.status <- 1;
+    end
+
 let short_sched () =
   match !selected_scheduller with
   |1 -> fcfs ()                                                             (* First Come First Serve *)
