@@ -32,7 +32,7 @@ let rec has_memory_available i n =
     let flag = ref true in
     let i = ref 0 in
     let () = while !flag do
-      if (has_memory_available (!i) (n)) then  (* enc *)
+      if (has_memory_available (!i) (n)) then
         begin
         for j = !i to (n - 1 + !i) do
           !heap.(j) <- pid
@@ -53,7 +53,7 @@ let next_allocate n pid =
   let flag = ref true in
   let i = ref 0 in
   let () = while !flag do
-    if (has_memory_available (!next_fit_index) (n)) then  (* enc *)
+    if (has_memory_available (!next_fit_index) (n)) then
       begin
       for j = !next_fit_index to (n - 1 + !next_fit_index) do
         !heap.(j) <- pid;
@@ -77,7 +77,7 @@ let best_allocate n pid =
   let count = ref 0 in
   let () = 
     for i = 0 to (Array.length !heap) - 1 do
-      if i = (Array.length !heap - 1) && !min >= !count && !count >= n then ind := !aux + 1; 
+      if i = (Array.length !heap - 1) && !min >= !count && !count >= n then if !aux = 0 then ind := !aux else ind := !aux + 1; 
       if !heap.(i) = -1 then count := !count + 1
       else if !count >= n && !min > !count then (min := !count; ind := i - !count; count := 0; aux := i)
       else (count := 0; aux := i);
@@ -86,7 +86,7 @@ let best_allocate n pid =
       for i = !ind to !ind + n - 1 do
         !heap.(i) <- pid
       done
-    else () in !ind
+    else () in if !ind = -1 then (-1) else (Array.length !heap)
 
 (* Worst Fit *)
 let worst_allocate n pid = 
@@ -94,8 +94,7 @@ let worst_allocate n pid =
   let count = ref 0 in
   let max = ref 0 in 
   let maxIndex = ref (-1) in
-  begin 
-    Printf.printf "f1\n";
+  let () = begin
     for i=0 to ((Array.length !heap) - 1) do
       if(!heap.(i) <> -1)
       then ((if !count > !max then (max := !count; maxIndex := !countIndex;));count := 0;countIndex := -1)
@@ -107,9 +106,12 @@ let worst_allocate n pid =
       for i = !maxIndex to (!maxIndex + n - 1) do
         !heap.(i) <- pid
       done;
-  end
+  end in if !maxIndex = -1 then (-1) else (Array.length !heap)
 
 let allocate_mem op n pid =
   match op with
   |1 -> first_allocate n pid
+  |2 -> next_allocate n pid
+  |3 -> best_allocate n pid
+  |4 -> worst_allocate n pid
   |_ ->first_allocate n pid
