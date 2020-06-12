@@ -8,6 +8,8 @@ let unblock v n =
   done
 
 let long_sched n =
+  if (Queue.is_empty blockedQ) then ()
+  else
   let flag = ref true in
   while !flag do
     let x = Array.make n false in

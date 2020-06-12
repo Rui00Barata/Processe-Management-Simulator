@@ -31,16 +31,34 @@ let turnaround () =
 let tme () =
   let sum = ref 0. in
   let n = ref 0. in
-  (Queue.iter (fun x -> sum := !sum +. (((float_of_int x.finish) -. (float_of_int x.arrival_time)) -. (float_of_int x.time)); n := !n +. 1.) terminatedQ; !sum /. !n)
+  (Queue.iter (fun x -> sum := !sum +. (((float_of_int x.finish) -. (float_of_int x.arrival_time)) -. (float_of_int x.burst_time)); n := !n +. 1.) terminatedQ; !sum /. !n)
 
 let burst_time () =
   let sum = ref 0. in
   let n = ref 0. in
-  (List.iter (fun (x : pcb) -> sum := !sum +. (float_of_int x.time); n := !n +. 1.) !pcb_table; !sum /. !n)
+  (List.iter (fun (x : pcb) -> sum := !sum +. (float_of_int x.burst_time); n := !n +. 1.) !pcb_table; !sum /. !n)
 
 let global_report () =
-  Printf.printf "Turnaround médio: %0.02f\n" (turnaround ()) ;
-  Printf.printf "Tempo médio de espera: %0.02f\n" (tme ());
-  Printf.printf "Burst Time médio: %0.02f\n\n" (burst_time ())
+  begin
+    Printf.printf "--- Estatísticas de Escalonamento ---\n";
+    Printf.printf "Turnaround médio: %0.02f\n" (turnaround ());
+    Printf.printf "Tempo médio de espera: %0.02f\n" (tme ());
+    Printf.printf "Burst Time médio: %0.02f\n\n" (burst_time ());
+    Printf.printf "--- Estatísticas de Gestão de Memória ---\n";
+    Printf.printf "FIRST-FIT: Número de fragmentos externos: %d\n" (Memory.fragment_count !heap_f);
+    Printf.printf "FIRST-FIT: Tempo médio de alocação: %.2f\n" (let sum = ref 0. in let () = (List.iter (fun x -> sum := !sum +. (float_of_int x)) !time_list_f) in (!sum/.(float_of_int (List.length !time_list_f))));
+    Printf.printf "FIRST-FIT: Percentagem de erros de alocação: %.2f%%\n" (let sum = ref 0. in let () = (List.iter (fun x -> sum := !sum +. (float_of_int x)) !success_list_f) in (!sum/.(float_of_int (List.length !success_list_f))));
+    Printf.printf "NEXT-FIT: Número de fragmentos externos: %d\n" (Memory.fragment_count !heap_n);
+    Printf.printf "NEXT-FIT: Tempo médio de alocação: %.2f\n" (let sum = ref 0. in let () = (List.iter (fun x -> sum := !sum +. (float_of_int x)) !time_list_n) in (!sum/.(float_of_int (List.length !time_list_n))));
+    Printf.printf "NEXT-FIT: Percentagem de erros de alocação: %.2f%%\n" (let sum = ref 0. in let () = (List.iter (fun x -> sum := !sum +. (float_of_int x)) !success_list_n) in (!sum/.(float_of_int (List.length !success_list_n))));
+    Printf.printf "BEST-FIT: Número de fragmentos externos: %d\n" (Memory.fragment_count !heap_b);
+    Printf.printf "BEST-FIT: Tempo médio de alocação: %.2f\n" (let sum = ref 0. in let () = (List.iter (fun x -> sum := !sum +. (float_of_int x)) !time_list_b) in (!sum/.(float_of_int (List.length !time_list_b))));
+    Printf.printf "BEST-FIT: Percentagem de erros de alocação: %.2f%%\n" (let sum = ref 0. in let () = (List.iter (fun x -> sum := !sum +. (float_of_int x)) !success_list_b) in (!sum/.(float_of_int (List.length !success_list_b))));
+    Printf.printf "WORST-FIT: Número de fragmentos externos: %d\n" (Memory.fragment_count !heap_w);
+    Printf.printf "WORST-FIT: Tempo médio de alocação: %.2f\n" (let sum = ref 0. in let () = (List.iter (fun x -> sum := !sum +. (float_of_int x)) !time_list_w) in (!sum/.(float_of_int (List.length !time_list_w))));
+    Printf.printf "WORST-FIT: Percentagem de erros de alocação: %.2f%%\n" (let sum = ref 0. in let () = (List.iter (fun x -> sum := !sum +. (float_of_int x)) !success_list_w) in (!sum/.(float_of_int (List.length !success_list_w))));
+
+  end
+
 
 
