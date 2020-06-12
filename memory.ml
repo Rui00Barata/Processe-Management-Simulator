@@ -116,7 +116,6 @@ let n_generator () =
   else let () = Random.init 42 in ((Random.int 7) + 3)
 
 let solicitate_allocation pid =
-  let () = Printf.printf "OLA\n" in
   let n = n_generator () in
   let aux = ref 0 in
   begin
