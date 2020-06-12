@@ -29,7 +29,22 @@ type instruction =
 }
 let memory = Array.make 1000 {ins = 'N'; n = 0; name = ""}
 let next_memory_index = ref 0
-let heap = ref (Array.make 128 (-1))
+(* First_fit vars *)
+let heap_f = ref (Array.make 128 (-1))
+let time_list_f : int list ref = ref []
+let success_list_f: int list ref = ref []
+(* Next_fit vars *)
+let heap_n = ref (Array.make 128 (-1))
+let time_list_n : int list ref = ref []
+let success_list_n: int list ref = ref []
+(* Best_fit vars *)
+let heap_b = ref (Array.make 128 (-1))
+let time_list_b : int list ref = ref []
+let success_list_b: int list ref = ref []
+(* Worst_fit vars *)
+let heap_w = ref (Array.make 128 (-1))
+let time_list_w : int list ref = ref []
+let success_list_w: int list ref = ref []
 
 (*PROCESSS CONTROL BLOCK*)
 type pcb = 

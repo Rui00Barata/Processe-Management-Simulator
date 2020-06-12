@@ -11,7 +11,7 @@ let line_to_instr line =
     else {ins = 'E';n = 0;name = ""}
 
 let copy_process (p : pcb) = 
-  {name = p.name; start = p.start; variable = p.variable; pid = !next_pid; ppid = p.pid; priority = p.priority; arrival_time = !time + 1; burst_time = p.burst_time; time = 0; pc = (p.pc + 1); status = 1; finish = -1}
+  {name = p.name; start = p.start; variable = p.variable; pid = !next_pid; ppid = p.pid; priority = p.priority; arrival_time = !time + 1; burst_time = p.time; time = 0; pc = (p.pc + 1); status = 1; finish = -1}
 
 let rec find_process_name s i =
   if (i = List.length !pcb_table) then -1
@@ -51,17 +51,19 @@ let openfile_string str =
   let fi = open_in (str^".prg") in
   let flag = ref true in
   let line = ref "" in
+  let burst = ref 0 in
   let instr = ref {ins = 'N'; n = 0; name = ""} in
-  while (!flag) do
+  let () = while (!flag) do
     try 
       begin 
+        burst := !burst + 1;
         line := input_line fi;
         instr := line_to_instr !line;
         memory.(!next_memory_index) <- !instr;
         next_memory_index := !next_memory_index + 1;
       end
     with End_of_file -> begin close_in fi; flag := false end
-  done
+  done in !burst
   
 let read_instr process =
   let instr = memory.(process.start + process.pc) in
@@ -71,11 +73,11 @@ let read_instr process =
     | 'A' -> (process.variable <- (process.variable + instr.n); process.pc<-(process.pc+1)) 
     | 'S' -> (process.variable <- (process.variable - instr.n); process.pc<-(process.pc+1)) 
     | 'B' -> (process.status <- 2; process.pc <- (process.pc+1); 
-              if (not !son_flag) then (executing_flag := false; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; preemp_flag := true;)
+              if (not !son_flag) then (executing_flag := false; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; preempt_flag := true;)
               else (son_flag := false; running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc))
     | 'T' -> (if (!son_flag) 
                 then (son_flag := false; running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc)
-                else (running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1); preemp_flag := true;
+                else (running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1); preempt_flag := true;
                   process.status <- 3; process.pc<-(process.pc+1); executing_flag := false; rem_time := 1; process.finish <- (!time + 1))
     | 'C' -> let filho = copy_process process in
               begin
@@ -102,10 +104,10 @@ let read_instr process =
                   process.name <- instr.name;
                   process.variable <- 0;
                   process.pc <- 0;
-                  openfile_string instr.name;
+                  process.burst_time <- openfile_string instr.name;
                 end
-    | 'H' -> ()
-    | 'D' -> Memory.deallocate_mem (running_proc.pid) (* NO T!! *)
+    | 'H' -> (Memory.solicitate_allocation process.pid; process.pc<-(process.pc+1))
+    | 'D' -> (if Memory.deallocate_mem (running_proc.pid) = -1 then Printf.fprintf stderr "Erro de dealocação de memória - Processo pid: %d sem memória alocada\n" process.pid else (); process.pc<-(process.pc+1)) (* NO T!! *)
     | _ -> Printf.fprintf stderr "Instrução inválida\n");
     running_proc.pc <- process.pc
   end
