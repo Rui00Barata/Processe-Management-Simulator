@@ -5,15 +5,17 @@ let clock () =
     begin
       while not (Queue.is_empty newQ) && (Queue.peek newQ).time = !time do
         Sim.openfile (Queue.pop newQ);
-        preempt_flag := true
+        if ((match Short.(!selected_scheduller) with |3|5 -> true |_ -> false)) then preempt_flag := true
       done;
-      if (not !executing_flag) then Process.controller ();
-      if (!executing_flag && (!rem_time > 0)) then
+      if ((!time mod !time_quantum) = 0) then Process.controller ();
+      if (!preempt_flag && (!rem_time <> !time_quantum) && (not !rr_flag)) then 
+        (Short.short_sched (); rem_time := !time_quantum; executing_flag := true);
+      if (!executing_flag && (!rem_time > 0) && (not !stop_time_flag)) then
       begin
         Exec.execute running_proc.ind;
         if !rem_time = 0 then executing_flag := false
       end;
-      if ((Process.(!buffercommand) <> '$') || (running_proc.ind <> -1) || (!time_flag)) then (time := !time + 1; time_flag := false);
+      if (((Process.(!buffercommand) <> '$') || !rr_flag || (running_proc.ind <> -1) || (!time_flag) || (((running_proc.ind = -1) && (Queue.is_empty readyQ)) )) && (not !stop_time_flag)) then (time := !time + 1; time_flag := false);
     end
   done
 
@@ -62,7 +64,6 @@ let scheduling_menu () =
     done
 
 let memory_management () =
-  (* Printf.printf "Qual o tamanho pretendido para a memória dinâmica?" *)
   let op1 = read_int () in
   let op2 = read_int () in
   (heap_f := Array.make (op1/op2) (-1);
@@ -107,7 +108,7 @@ let menu () =
       (if !debug_mode then "Ativado" else "Desativado"));
       Printf.printf "\n|\n|\n|\tMenu\n|\n|\t1 - Iniciar\n|\t2 - Opções\n|\n|\t0 - Sair\n|\n|\tSELECT: ";
       (match (read_int ()) with
-      | 1 -> (ignore(Sys.command "clear"); flag := false; clock ())
+      | 1 -> (ignore(Sys.command "clear"); flag := false; if (Short.(!selected_scheduller) <> 6) then rem_time := !time_quantum; clock ())
       | 2 -> options_menu ()
       | 0 -> (ignore(Sys.command "clear"); exit 0)
       | _ -> ());

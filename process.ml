@@ -29,10 +29,17 @@ let interrupt () =
 
 let read_command c = 
   match c with
-  |'E' -> if Queue.is_empty readyQ then if (running_proc.ind <> -1) then (rem_time := !time_quantum; executing_flag := true; buffercommand := '$') else if (not (Queue.is_empty newQ)) then buffercommand := 'E' else () else (Short.short_sched (); rem_time := !time_quantum; executing_flag := true; buffercommand := '$')
-  |'I' -> interrupt ()
-  |'D' -> Long.long_sched (Queue.length blockedQ)
-  |'R' -> Report.report ()
+  |'E' -> let () = stop_time_flag := false in
+          let () = rr_flag := false in
+          if Queue.is_empty readyQ then 
+            if (running_proc.ind <> -1) then (rem_time := !time_quantum; executing_flag := true; buffercommand := '$') 
+            else 
+              if (not (Queue.is_empty newQ)) then buffercommand := 'E' 
+              else (stop_time_flag := true) 
+          else (Short.short_sched (); rem_time := !time_quantum; executing_flag := true; buffercommand := '$')
+  |'I' -> (interrupt ();stop_time_flag := true)
+  |'D' -> (Long.long_sched (Queue.length blockedQ);stop_time_flag := true; if ((match Short.(!selected_scheduller) with |3|5 -> true |_ -> false)) then preempt_flag := true)
+  |'R' -> (Report.report ();stop_time_flag := true)
   |'T' -> begin Report.global_report (); clock_flag := false; exit 0 end
   | _ -> Printf.fprintf stderr "Comando inválido\n"
 
