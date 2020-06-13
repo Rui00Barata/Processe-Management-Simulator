@@ -1,5 +1,7 @@
 open Lib
 
+let () = Random.init 42
+
 (* Deallocate *)
 let deallocate_mem pid =
   let flag = ref false in
@@ -21,7 +23,7 @@ let fragment_count heap =
         else 
           (if (!hole_size = 1 || !hole_size = 2) then n_holes := !n_holes + 1;
           hole_size := 0)
-    done in !n_holes
+    done in let () =  if (!hole_size = 1 || !hole_size = 2) then n_holes := !n_holes + 1 in !n_holes
 
 let rec has_memory_available i n heap =
   if n = 0 then true
@@ -53,6 +55,7 @@ let rec has_memory_available i n heap =
 let next_fit_index = ref 0
 
 let next_allocate n pid =
+  let () = if (!next_fit_index = Array.length !heap_n) then next_fit_index := 0 in
   let flag = ref true in
   let i = ref 0 in
   let () = while !flag do
@@ -79,7 +82,7 @@ let best_allocate n pid =
   let min = ref (max_int) in
   let count = ref 0 in
   let () = 
-    for i = 0 to (Array.length !heap_b) - 1 do
+    for i = 0 to ((Array.length !heap_b) - 1) do
       (if !heap_b.(i) = -1 then (count := !count + 1)
       else (if !count >= n && !min > !count then (min := !count; ind := i - !count; count := 0; aux := i)
       else (count := 0; aux := i)));
@@ -114,8 +117,8 @@ let worst_allocate n pid =
   end in if !flag then (Array.length !heap_w) else -1;;
 
 let n_generator () =
-  if (Queue.length readyQ < 10) then 2
-  else let () = Random.init 42 in ((Random.int 7) + 3)
+  if (Queue.length readyQ < 1) then 3
+  else ((Random.int 7) + 3)
 
 let solicitate_allocation pid =
   let n = n_generator () in

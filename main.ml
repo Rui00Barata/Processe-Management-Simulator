@@ -24,13 +24,14 @@ let scheduling_menu () =
   while !flag do
     begin
       ignore(Sys.command "clear");
-      for i = 0 to 70 do print_char '-' done;
+      for i = 0 to 90 do print_char '-' done;
       (Printf.printf "\n|\n|\tEscalonamento selecionado:   %s\n|\tTipo de escalonamento:       %s\n" 
       (match Short.(!selected_scheduller) with | 1 -> "First Come First Serve" |2 -> "Priority" |3 -> "Priority" |4 -> "Shortest Job First" |5 -> "Shortest Job First" |6 -> "Round Robin" | _ -> "First Come First Serve")
       (if (match Short.(!selected_scheduller) with |3|5|6 -> false |_ -> true) then "Não preemptivo" else "Preemptivo"));
       (Printf.printf "|\tTime Quantum:                %d\n|\tModo de Debug:               %s" !time_quantum 
       (if !debug_mode then "Ativado" else "Desativado"));
-      Printf.printf "\n|\n|\n|\tMenu de Escalonamento\n|\n|\t1 - FCFS\n|\t2 - Priority\n|\t3 - SJF\n|\n|\t0 - Voltar ao Menu de Opções\n|\n|\tSELECT: ";
+      Printf.printf "\n|\tNúmero de partições:         %-5d" (Array.length !heap_f);
+      Printf.printf "\n|\n|\n|\tMenu de Escalonamento\n|\n|\t1 - FCFS\n|\t2 - Priority\n|\t3 - SJF\n|\n|\t0 - Voltar ao Menu de Opções\n|\n";for i = 0 to 90 do print_char '-' done; Printf.printf "\n>> ";
       let op = read_int () in
       (match op with
       | 1 -> (flag := false; Short.selected_scheduller := 1)
@@ -46,13 +47,14 @@ let scheduling_menu () =
     while !flag do
       begin
         ignore(Sys.command "clear");
-        for i = 0 to 70 do print_char '-' done;
+        for i = 0 to 90 do print_char '-' done;
         (Printf.printf "\n|\n|\tEscalonamento selecionado:   %s\n|\tTipo de escalonamento:       %s\n" 
         (match Short.(!selected_scheduller) with |1 -> "First Come First Serve" |2 -> "Priority" |3 -> "Priority" |4 -> "Shortest Job First" |5 -> "Shortest Job First" |6 -> "Round Robin" |_ -> "First Come First Serve")
         (if (match Short.(!selected_scheduller) with |3|5|6 -> false |_ -> true) then "Não preemptivo" else "Preemptivo"));
         (Printf.printf "|\tTime Quantum:                %d\n|\tModo de Debug:               %s" !time_quantum 
         (if !debug_mode then "Ativado" else "Desativado"));
-        Printf.printf "\n|\n|\n|\tMenu de Escalonamento\n|\n|\t1 - Priority\n|\t2 - SJF\n|\t3 - Round Robin\n|\n|\t0 - Voltar ao Menu de Opções\n|\n|\tSELECT: ";
+        Printf.printf "\n|\tNúmero de partições:         %-5d" (Array.length !heap_f);
+        Printf.printf "\n|\n|\n|\tMenu de Escalonamento\n|\n|\t1 - Priority\n|\t2 - SJF\n|\t3 - Round Robin\n|\n|\t0 - Voltar ao Menu de Opções\n|\n";for i = 0 to 90 do print_char '-' done; Printf.printf "\n>> ";
         let op = read_int () in
         (match op with
         |1 -> (flag := false; Short.selected_scheduller := 3)
@@ -64,7 +66,9 @@ let scheduling_menu () =
     done
 
 let memory_management () =
+  let () = Printf.printf "Qual o tamanho pretendido para a memória? >> " in
   let op1 = read_int () in
+  let () = Printf.printf "Qual o tamanho pretendido para as partições? >> " in
   let op2 = read_int () in
   (heap_f := Array.make (op1/op2) (-1);
   heap_n := Array.make (op1/op2) (-1);
@@ -76,18 +80,19 @@ let options_menu () =
   while !flag do
     begin
       ignore(Sys.command "clear");
-      for i = 0 to 70 do print_char '-' done;
+      for i = 0 to 90 do print_char '-' done;
       (Printf.printf "\n|\n|\tEscalonamento Selecionado:   %s\n|\tTipo de Escalonamento:       %s\n" 
       (match Short.(!selected_scheduller) with | 1 -> "First Come First Serve" |2 -> "Priority" |3 -> "Priority" |4 -> "Shortest Job First" |5 -> "Shortest Job First" |6 -> "Round Robin" | _ -> "First Come First Serve")
       (if (match Short.(!selected_scheduller) with |3|5|6 -> false |_ -> true) then "Não preemptivo" else "Preemptivo"));
       (Printf.printf "|\tTime Quantum:                %d\n|\tModo de Debug:               %s" !time_quantum 
       (if !debug_mode then "Ativado" else "Desativado"));
-      Printf.printf "\n|\n|\n|\tMenu de Opções\n|\n|\t1 - Escalonamento Não Preemptivo\n|\t2 - Escalonamento Preemptivo\n|\t3 - Alterar Time Quantum\n|\n|\t0 - Voltar ao Menu Principal\n|\n|\tSELECT: ";
+      Printf.printf "\n|\tNúmero de partições:         %-5d" (Array.length !heap_f);
+      Printf.printf "\n|\n|\n|\tMenu de Opções\n|\n|\t1 - Escalonamento Não Preemptivo\n|\t2 - Escalonamento Preemptivo\n|\t3 - Alterar Time Quantum\n|\t4 - Alterar o tamanho para o Heap\n|\n|\t0 - Voltar ao Menu Principal\n|\n";for i = 0 to 90 do print_char '-' done; Printf.printf "\n>> ";
       let op = read_int () in
       (match op with
       | 1 -> scheduling_menu ()
       | 2 -> scheduling_menup ()
-      | 3 -> begin Printf.printf "|\n|\tInsira o novo valor do Time Quantum: "; time_quantum := read_int () end
+      | 3 -> begin Printf.printf "\nInsira o novo valor do Time Quantum: >> "; time_quantum := read_int () end
       | 4 -> memory_management ()
       | 0 -> flag := false
       | _ -> ());
@@ -100,13 +105,14 @@ let menu () =
   while !flag do
     begin
       ignore(Sys.command "clear");
-      for i = 0 to 70 do print_char '-' done;
+      for i = 0 to 90 do print_char '-' done;
       (Printf.printf "\n|\n|\tEscalonamento Selecionado:   %s\n|\tTipo de Escalonamento:       %s\n" 
       (match Short.(!selected_scheduller) with |1 -> "First Come First Serve" |2 -> "Priority" |3 -> "Priority" |4 -> "Shortest Job First" |5 -> "Shortest Job First" |6 -> "Round Robin" | _ -> "First Come First Serve")
       (if (match Short.(!selected_scheduller) with |3|5|6 -> false |_ -> true) then "Não preemptivo" else "Preemptivo"));
       (Printf.printf "|\tTime Quantum:                %d\n|\tModo de Debug:               %s" !time_quantum 
       (if !debug_mode then "Ativado" else "Desativado"));
-      Printf.printf "\n|\n|\n|\tMenu\n|\n|\t1 - Iniciar\n|\t2 - Opções\n|\n|\t0 - Sair\n|\n|\tSELECT: ";
+      Printf.printf "\n|\tNúmero de partições:         %-5d" (Array.length !heap_f);
+      Printf.printf "\n|\n|\n|\tMenu\n|\n|\t1 - Iniciar\n|\t2 - Opções\n|\n|\t0 - Sair\n|\n";for i = 0 to 90 do print_char '-' done; Printf.printf "\n>> ";
       (match (read_int ()) with
       | 1 -> (ignore(Sys.command "clear"); flag := false; if (Short.(!selected_scheduller) <> 6) then rem_time := !time_quantum; clock ())
       | 2 -> options_menu ()
