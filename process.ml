@@ -41,15 +41,16 @@ let read_command c =
   |'D' -> (Long.long_sched (Queue.length blockedQ);stop_time_flag := true; if ((match Short.(!selected_scheduller) with |3|5 -> true |_ -> false)) then preempt_flag := true)
   |'R' -> (Report.report ();stop_time_flag := true)
   |'T' -> begin Report.global_report (); clock_flag := false; exit 0 end
-  | _ -> Printf.fprintf stderr "Comando inválido\n"
+  | _ -> Printf.printf  "Comando inválido\n"
 
 let read_terminal ()=
   let character = ref 'x' in
   try 
     begin 
+      Printf.printf ">> ";
       let str = read_line () in
       if (String.length str) > 1 then
-        Printf.fprintf stderr "Comando Inválido\n"
+        Printf.printf  "Comando Inválido\n"
       else
         begin
           character := str.[0];
@@ -64,7 +65,7 @@ let read_control fi =
   try
     let str = remove_CR (input_line fi) in
     if (String.length str) > 1 then
-      Printf.fprintf stderr "Comando Inválido\n"
+      Printf.printf  "Comando Inválido\n"
     else
       begin
         character := str.[0];

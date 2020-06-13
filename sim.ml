@@ -75,7 +75,8 @@ let read_instr process =
     | 'B' -> (process.status <- 2; process.pc <- (process.pc+1); 
               if (process.ppid = 0) then (executing_flag := false; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; rem_time := 1; if (Short.(!selected_scheduller) = 6) then rr_flag := true; if (not (Queue.is_empty readyQ)) then preempt_flag := true)
               else (running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc))
-    | 'T' -> (if (process.ppid <> 0) 
+    | 'T' -> (let () = (if Memory.deallocate_mem (running_proc.pid) = -1 then Printf.printf  "Erro de dealocação de memória - Processo pid: %d sem memória alocada\n" process.pid else (); process.pc<-(process.pc+1)) in
+              if (process.ppid <> 0) 
                 then (running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc)
                 else (running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1); if (not (Queue.is_empty readyQ)) then preempt_flag := true;
                   process.status <- 3; process.pc<-(process.pc+1); executing_flag := false; if (Short.(!selected_scheduller) = 6) then rr_flag := true; rem_time := 1; process.finish <- (!time + 1))
@@ -108,7 +109,7 @@ let read_instr process =
                   process.burst_time <- openfile_string instr.name;
                 end
     | 'H' -> (Memory.solicitate_allocation process.pid; process.pc<-(process.pc+1))
-    | 'D' -> (if Memory.deallocate_mem (running_proc.pid) = -1 then Printf.fprintf stderr "Erro de dealocação de memória - Processo pid: %d sem memória alocada\n" process.pid else (); process.pc<-(process.pc+1)) (* NO T!! *)
-    | _ -> Printf.fprintf stderr "Instrução inválida\n");
+    | 'D' -> (if Memory.deallocate_mem (running_proc.pid) = -1 then Printf.printf  "Erro de dealocação de memória - Processo pid: %d sem memória alocada\n" process.pid else (); process.pc<-(process.pc+1))
+    | _ -> Printf.printf  "Instrução inválida\n");
     running_proc.pc <- process.pc
   end
