@@ -76,18 +76,20 @@ let priority () =                        (* Wo/ Preemption *)
 
 (* Round Robin *)
 
-let round_robin () = 
-  let temp = Queue.pop readyQ in
-  let ind = (findProcInd !pcb_table temp.pid 0) in
-  if (ind < 0) then print_endline "ERRO! O Processo nao existe na tabela"
-  else
-    begin
-      if running_proc.ind <> -1 then ((List.nth !pcb_table running_proc.ind).status <- 0; Queue.push (List.nth !pcb_table running_proc.ind) readyQ);
-      running_proc.ind <- ind;
-      running_proc.pid <- temp.pid;
-      running_proc.pc <- temp.pc;
-      temp.status <- 1;
-    end
+let round_robin () =
+  if (!rem_time = 0) then 
+    let temp = Queue.pop readyQ in
+    let ind = (findProcInd !pcb_table temp.pid 0) in
+    if (ind < 0) then Printf.printf "ERRO! O Processo nao existe na tabela\n"
+    else
+      begin
+        if running_proc.ind <> -1 then ((List.nth !pcb_table running_proc.ind).status <- 0; Queue.push (List.nth !pcb_table running_proc.ind) readyQ);
+        running_proc.ind <- ind;
+        running_proc.pid <- temp.pid;
+        running_proc.pc <- temp.pc;
+        temp.status <- 1;
+        preempt_flag := false;
+      end
 
 (* Shortest Job First *)
 
@@ -148,4 +150,5 @@ let short_sched () =
   |5 -> sjf_p ()                                                            (* Shortest Job First w/ preemption *)
   |6 -> round_robin ()                                                      (* Round Robin w/ preemption *)
   |_ -> fcfs ());
-  preempt_flag := false;)
+  if (!selected_scheduller <> 6) then preempt_flag := false;
+  (* Printf.printf "shot\n"; *))

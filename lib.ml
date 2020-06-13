@@ -81,7 +81,9 @@ let time_flag = ref false
 
 let debug_mode = ref false
 
-let son_flag = ref false
+let rr_flag = ref false
+
+let stop_time_flag = ref false 
 
 let preempt_flag = ref false
 

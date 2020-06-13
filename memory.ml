@@ -91,12 +91,13 @@ let best_allocate n pid =
       done
     else () in if !ind = (-1) then !ind else (Array.length !heap_b)
 
-  (* Worst Fit *)
+(* Worst Fit *)
 let worst_allocate n pid = 
   let countIndex = ref (-1) in
   let count = ref 0 in
   let max = ref 0 in 
   let maxIndex = ref (-1) in
+  let flag = ref false in
   let () = begin
     for i=0 to ((Array.length !heap_w) - 1) do
       if(!heap_w.(i) <> -1)
@@ -107,9 +108,10 @@ let worst_allocate n pid =
     if (has_memory_available (!maxIndex) (n) (!heap_w))
     then 
       for i = !maxIndex to (!maxIndex + n - 1) do
-        !heap_w.(i) <- pid
+        !heap_w.(i) <- pid;
+        flag := true
       done;
-  end in 128
+  end in if !flag then (Array.length !heap_w) else -1;;
 
 let n_generator () =
   if (Queue.length readyQ < 10) then 2

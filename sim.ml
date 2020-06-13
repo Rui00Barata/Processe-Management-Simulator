@@ -42,7 +42,7 @@ let openfile newP =
             instr := line_to_instr !line;
             memory.(!next_memory_index) <- !instr;
             next_memory_index := !next_memory_index + 1;
-            burst := !burst + 1
+            if (!instr.ins = 'C') then burst := !burst - !instr.n + 2 else burst := !burst + 1
           end
         with End_of_file -> begin process.burst_time <- !burst ;close_in fi; flag := false; pcb_table := !pcb_table @ [process]; Queue.push process readyQ; next_pid := !next_pid + 1 end
       done
@@ -56,11 +56,11 @@ let openfile_string str =
   let () = while (!flag) do
     try 
       begin 
-        burst := !burst + 1;
         line := input_line fi;
         instr := line_to_instr !line;
         memory.(!next_memory_index) <- !instr;
         next_memory_index := !next_memory_index + 1;
+        burst := !burst + 1;
       end
     with End_of_file -> begin close_in fi; flag := false end
   done in !burst
@@ -73,12 +73,12 @@ let read_instr process =
     | 'A' -> (process.variable <- (process.variable + instr.n); process.pc<-(process.pc+1)) 
     | 'S' -> (process.variable <- (process.variable - instr.n); process.pc<-(process.pc+1)) 
     | 'B' -> (process.status <- 2; process.pc <- (process.pc+1); 
-              if (not !son_flag) then (executing_flag := false; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; preempt_flag := true;)
-              else (son_flag := false; running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc))
-    | 'T' -> (if (!son_flag) 
-                then (son_flag := false; running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc)
-                else (running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1); preempt_flag := true;
-                  process.status <- 3; process.pc<-(process.pc+1); executing_flag := false; rem_time := 1; process.finish <- (!time + 1))
+              if (process.ppid = 0) then (executing_flag := false; running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1; rem_time := 1; if (Short.(!selected_scheduller) = 6) then rr_flag := true; if (not (Queue.is_empty readyQ)) then preempt_flag := true)
+              else (running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc))
+    | 'T' -> (if (process.ppid <> 0) 
+                then (running_proc.ind <- Short.findProcInd !pcb_table process.ppid 0; running_proc.pid <- process.ppid; running_proc.pc <- (List.nth !pcb_table running_proc.ind).pc)
+                else (running_proc.ind <- -1; running_proc.pid <- -1; running_proc.pc <- -1); if (not (Queue.is_empty readyQ)) then preempt_flag := true;
+                  process.status <- 3; process.pc<-(process.pc+1); executing_flag := false; if (Short.(!selected_scheduller) = 6) then rr_flag := true; rem_time := 1; process.finish <- (!time + 1))
     | 'C' -> let filho = copy_process process in
               begin
                 process.pc <- (process.pc + instr.n);
@@ -88,7 +88,7 @@ let read_instr process =
                 running_proc.ind <- Short.findProcInd !pcb_table filho.pid 0;
                 running_proc.pid <- filho.pid;
                 running_proc.pc <- filho.pc;
-                son_flag := true
+
               end
     | 'L' -> let ind = find_process_name instr.name 0 in
               if (ind <> -1) then                               (* Encontrou o programa já aberto -> não precisa de abrir *)
@@ -96,7 +96,8 @@ let read_instr process =
                   process.start <- (List.nth !pcb_table ind).start;
                   process.name <- instr.name;
                   process.variable <- 0;
-                  process.pc <- 0
+                  process.pc <- 0;
+                  process.burst_time <- (List.nth !pcb_table ind).burst_time
                 end
               else                                              (* Não encontrou o programa -> Temos de abrir *)
                 begin
