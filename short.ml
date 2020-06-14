@@ -94,11 +94,11 @@ let round_robin () =
 (* Shortest Job First *)
 
 let findShortestJob burst = 
-  let proc = ref {name = ""; start = (-1); variable = (-1); pid = (-1); ppid = (-1); priority = (-1); arrival_time = (-1); burst_time = (burst); time = (-1); pc = (-1); status = (-1); finish = (-1)} in
+  let proc = ref {name = ""; start = (-1); variable = (-1); pid = (-1); ppid = (-1); priority = (-1); arrival_time = (-1); burst_time = (burst); time = (-1); pc = (0); status = (-1); finish = (-1)} in
   let () = begin
     for i = 0 to (Queue.length readyQ - 1) do
       let p = Queue.pop readyQ in
-      (if (p.burst_time < !proc.burst_time) then (proc := p)
+      (if ((p.burst_time - p.pc) < (!proc.burst_time - !proc.pc)) then (proc := p)
       else if (p.burst_time = !proc.burst_time) then if (p.arrival_time < !proc.arrival_time) then (proc := p);
       Queue.push p readyQ)
     done;
@@ -112,7 +112,7 @@ let findShortestJob burst =
 let sjf_p () =                           (* W/ Preemption *)
   if !preempt_flag then
   if (running_proc.ind <> (-1)) then
-    let p = findShortestJob ((List.nth !pcb_table running_proc.ind).burst_time) in
+    let p = findShortestJob ((List.nth !pcb_table running_proc.ind).burst_time - (List.nth !pcb_table running_proc.ind).pc) in
     begin
       if ((p <> (List.nth !pcb_table running_proc.ind))) then 
         let temp = (List.nth !pcb_table running_proc.ind) in 
@@ -131,7 +131,7 @@ let sjf_p () =                           (* W/ Preemption *)
       p.status <- 1;
     end
 
-let sjf () =
+let sjf () =                             (* Wo/ Preemption *)
   if (running_proc.ind = (-1)) then
     let p = findShortestJob (max_int) in
     begin
@@ -150,5 +150,4 @@ let short_sched () =
   |5 -> sjf_p ()                                                            (* Shortest Job First w/ preemption *)
   |6 -> round_robin ()                                                      (* Round Robin w/ preemption *)
   |_ -> fcfs ());
-  if (!selected_scheduller <> 6) then preempt_flag := false;
-  (* Printf.printf "shot\n"; *))
+  if (!selected_scheduller <> 6) then preempt_flag := false;)
