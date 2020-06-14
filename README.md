@@ -15,3 +15,5 @@ Como compilar e executar:
 
 
 12-5-2020 ----- Done First Milestone.
+13-6-2020 ----- Done Second Milestone.
+14-6-2020 ----- Finished the Project Report.
