@@ -11,9 +11,9 @@ Como compilar e executar:
 - Execução: 
     - Modo normal (Usa o control.txt): ./Simulador
     - Modo debug (Usa a terminal): ./Simulador -d
+
+#   
     
-
-
-12-5-2020 ----- Done First Milestone.
-13-6-2020 ----- Done Second Milestone.
-14-6-2020 ----- Finished the Project Report.
+- 12-5-2020 ----- Done First Milestone.
+- 13-6-2020 ----- Done Second Milestone.
+- 14-6-2020 ----- Finished the Project Report.
