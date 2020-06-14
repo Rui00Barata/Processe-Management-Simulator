@@ -19,13 +19,14 @@ let read_plan () =
   done
 
 let interrupt () = 
-  begin
-    Queue.push (List.nth !pcb_table running_proc.ind) blockedQ;
-    running_proc.ind <- -1;
-    running_proc.pid <- -1;
-    running_proc.pc <- -1;
-    executing_flag := false
-  end
+  if (running_proc.ind <> (-1)) then
+    begin
+      Queue.push (List.nth !pcb_table running_proc.ind) blockedQ;
+      running_proc.ind <- -1;
+      running_proc.pid <- -1;
+      running_proc.pc <- -1;
+      executing_flag := false
+    end
 
 let read_command c = 
   match c with
