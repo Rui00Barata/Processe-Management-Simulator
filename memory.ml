@@ -37,7 +37,7 @@ let rec has_memory_available i n heap =
     let flag = ref true in
     let i = ref 0 in
     let () = while !flag do
-      if (has_memory_available (!i) (n) (!heap_f)) then  (* enc *)
+      if (has_memory_available (!i) (n) (!heap_f)) then 
         begin
         for j = !i to (n - 1 + !i) do
           !heap_f.(j) <- pid
@@ -59,7 +59,7 @@ let next_allocate n pid =
   let flag = ref true in
   let i = ref 0 in
   let () = while !flag do
-    if (has_memory_available (!next_fit_index) (n) (!heap_n)) then  (* enc *)
+    if (has_memory_available (!next_fit_index) (n) (!heap_n)) then 
       begin
       for j = !next_fit_index to (n - 1 + !next_fit_index) do
         !heap_n.(j) <- pid;

@@ -131,7 +131,7 @@ let sjf_p () =                           (* W/ Preemption *)
       p.status <- 1;
     end
 
-let sjf () =
+let sjf () =                             (* Wo/ Preemption *)
   if (running_proc.ind = (-1)) then
     let p = findShortestJob (max_int) in
     begin
@@ -150,5 +150,4 @@ let short_sched () =
   |5 -> sjf_p ()                                                            (* Shortest Job First w/ preemption *)
   |6 -> round_robin ()                                                      (* Round Robin w/ preemption *)
   |_ -> fcfs ());
-  if (!selected_scheduller <> 6) then preempt_flag := false;
-  (* Printf.printf "shot\n"; *))
+  if (!selected_scheduller <> 6) then preempt_flag := false;)
